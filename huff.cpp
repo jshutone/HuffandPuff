@@ -7,17 +7,16 @@ using namespace std;
 
 struct HuffTable
 {
-    int glyph = -1;
-    int frequency = 0;
-    int leftP = -1;
-    int rightP = -1;
+    int glyph;
+    int frequency;
+    int leftP;
+    int rightP;
 };
 
 struct FileInformation 
 {
     string fileName;
     int fileNameLength;
-    ifstream fileStream;
     double fileStreamLength;
     int glyphsInFile;
 };
@@ -28,7 +27,7 @@ int main() {
     // get filename
     FileInformation newFile;
     cout << "Filename to compress: ";
-    cin >> newFile.fileName
+    cin >> newFile.fileName;
     
 
 
