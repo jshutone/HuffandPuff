@@ -1,9 +1,6 @@
 #include <iostream>
 
-
 using namespace std;
-
-
 
 struct HuffTable
 {
@@ -28,6 +25,9 @@ int main() {
     FileInformation newFile;
     cout << "Filename to compress: ";
     cin >> newFile.fileName;
+
+    newFile.fileNameLength = sizeof(newFile.fileName);
+    cout << newFile.fileNameLength << endl;
     
 
 
