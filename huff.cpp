@@ -21,8 +21,16 @@
 
 
 #include <iostream>
+#include <string>
+#include <ctime>
+#include<fstream>
 
 using namespace std;
+
+const int MAXTEXT = 80;
+const int MAXCODE = 64;
+const int MAXGLYPH = 257;
+const int EOF_GLYPH = 256;
 
 struct HuffTable
 {
@@ -32,6 +40,28 @@ struct HuffTable
     int rightP;
 };
 
+struct HUFFMANINFO {
+
+};
+
+struct FAKESTRING {
+    char s{ MAXCODE };
+};
+
+typedef HUFFMANINFO HuffTable[2 + MAXGLYPH - 1];
+
+typedef char BITSTRING[MAXGLYPH + 1];
+
+HuffTable table;
+CODETABLE code;
+
+int glyphs;
+char sourcefile[80];
+char destfile[80];
+
+ifstream source;
+ofstream dest;
+
 struct FileInformation 
 {
     string fileName;
@@ -40,7 +70,73 @@ struct FileInformation
     int glyphsInFile;
 };
 
+void CreateInitialTable() {
 
+    int i;
+    unsigned char buffer[MAXTEXT];
+
+    for (i = 0; i <= MAXGLYPH; i++) {
+        table[i].freq = 0;
+        table[i].glyph = 0;
+        table[i].left = 0;
+        table[i].right = 0;
+    }
+
+    while (!source.eof()) {
+        source.read((char*)buffer.MAXTEXT);
+        for (i = 0; i < source.gcount(); i++) {
+            table[buffer[i]].freq++
+        }
+        
+    }
+
+    table[EOF_GLYPH].freq = 1;
+
+    Compact();
+    SelectionSort();
+}
+
+void SelectionSort() {
+    HuffTable temp;
+    int i, j, small;
+
+    for (i = 0; i <= (glyphs - 2); i++) {
+        small = i;
+        for(j = i +1, j<=(glyphs - 1); j++)
+            if (table[j].freq < table[small].freq) {
+                small = j;
+            }
+        temp = table[i];
+        table[i] = small;
+        table[small] = temp;
+    }
+}
+
+
+void WriteTable() {
+    int tableSize = 2 * glyphs - 1;
+    dest.write((char*)&tablesize, sizeof(tableSize));
+
+    for (int i = 0; i < tableSize; i++) {
+        dest.write((char*)&table[i].glyph, sizeof(table[i].glyph));
+        dest.write((char*)&table[i].left, sizeof(table[i].left));
+        dest.write((char*)&table[i].right, sizeof(table[i].right));
+    }
+}
+
+
+void EncodeFile() {
+
+    unsigned char buffer[MAXTEST];
+    int i;
+
+    WriteTable();
+    c = 0;
+    p = 1;
+    source.clear();
+    source.seekg(0);
+    
+}
 
 int main() {
     // get filename
