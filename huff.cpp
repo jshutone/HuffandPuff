@@ -156,3 +156,32 @@ int main() {
     cout << "The time was " << (double(end - start) / CLOCKS_PER_SEC) <<
         " seconds." << endl;
 }
+
+inline bool EndsWith(string const & str, string const file_extension) {
+	bool flag = false;
+	if (str.size() < file_extension.size()) {
+		return flag;
+	}
+	return 0 == str.compare(str.size() - file_extension.size(),
+		file_extension.size(),
+		file_extension,
+		0,
+		file_extension.size());
+}
+
+inline void AppendFileExtension(string & input_file_name, string const file_extension)
+{
+	if (!EndsWith(input_file_name, file_extension)) {
+		input_file_name = RemoveFileExtension(input_file_name);
+		input_file_name += ".huf";
+	}
+}
+
+inline string RemoveFileExtension(const string & filename)
+{
+	size_t last_dot = filename.find_last_of(".");
+	if (last_dot == std::string::npos) {
+		return filename;
+	}
+	return filename.substr(0, last_dot);
+}
