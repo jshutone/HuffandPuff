@@ -185,3 +185,22 @@ inline string RemoveFileExtension(const string & filename)
 	}
 	return filename.substr(0, last_dot);
 }
+
+void BubbleSort(HuffTableEntry huff_table[],int n)
+{
+	bool did_swap = true;
+	int num_pairs = n;
+	HuffTableEntry temp;
+	while (did_swap) {
+		num_pairs--;
+		did_swap = false;
+		for (int index = 0; index < num_pairs; index++) {
+			if (huff_table[index].frequency > huff_table[index + 1].frequency) {
+				temp = huff_table[index];
+				huff_table[index] = huff_table[index + 1];
+				huff_table[index + 1] = temp;
+				did_swap = true;
+			}
+		}
+	}
+}
