@@ -250,3 +250,45 @@ inline int MarkM(HuffTableEntry table[], const int slot_one, const int slot_two)
 		return slot_two;
 	}
 }
+
+void Reheap(HuffTableEntry frequency_table[], int m, int h)
+{
+	int head = (m - 1) / 2;
+	int left_child = (m * 2) + 1;
+	int right_child = (m * 2) + 2;
+	if (m >= h || h == 1) {
+		return;
+	}
+	if (frequency_table[head].frequency > frequency_table[m].frequency) {
+		swap(frequency_table[head], frequency_table[m]);
+		if (m != 0) {
+			Reheap(frequency_table, head, h);
+		}
+	}
+	else {
+		if (right_child < h) {
+			if (frequency_table[m].frequency > frequency_table[left_child].frequency &&
+				frequency_table[m].frequency > frequency_table[right_child].frequency) {
+				if (frequency_table[left_child].frequency <= frequency_table[right_child].frequency) {
+					swap(frequency_table[m], frequency_table[left_child]);
+					Reheap(frequency_table, left_child, h);
+				}
+				else {
+					swap(frequency_table[m], frequency_table[right_child]);
+					Reheap(frequency_table, right_child, h);
+				}
+			}
+			else if (frequency_table[m].frequency > frequency_table[left_child].frequency ||
+				frequency_table[m].frequency > frequency_table[right_child].frequency) {
+				int minimum = MarkM(frequency_table, left_child, right_child);
+				swap(frequency_table[m], frequency_table[minimum]);
+				Reheap(frequency_table, minimum, h);
+			}
+		}
+		else if (left_child < h) {
+			if (frequency_table[m].frequency > frequency_table[left_child].frequency) {
+				swap(frequency_table[m], frequency_table[left_child]);
+			}
+		}
+	}
+}
