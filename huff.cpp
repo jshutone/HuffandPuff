@@ -204,3 +204,49 @@ void BubbleSort(HuffTableEntry huff_table[],int n)
 		}
 	}
 }
+
+void CreateHuffmanTable(HuffTableEntry frequency_table[], int length)
+{
+	int h = length - 1;
+	int f = length;
+	int m;
+
+	do {
+		if (h >= 2) {
+			m = MarkM(frequency_table, 1, 2);
+		}
+		else if (h >= 1) {
+			m = 1;
+		}
+		swap(frequency_table[m], frequency_table[f]);
+
+		if (m < h) {
+			swap(frequency_table[m], frequency_table[h]);
+		}
+		Reheap(frequency_table, m, h);
+
+		swap(frequency_table[0], frequency_table[h]);
+
+		// Create a new frequency node
+		frequency_table[0].glyph = -1;
+		frequency_table[0].frequency = frequency_table[h].frequency + frequency_table[f].frequency;
+		frequency_table[0].left = h;
+		frequency_table[0].right = f;
+
+		Reheap(frequency_table, 0, h);
+
+		h--;
+		f++;
+	} while (f != 2 * length - 1); 
+
+}
+
+inline int MarkM(HuffTableEntry table[], const int slot_one, const int slot_two)
+{
+	if (table[slot_one].frequency <= table[slot_two].frequency) {
+		return slot_one;
+	}
+	else {
+		return slot_two;
+	}
+}
