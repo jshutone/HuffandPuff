@@ -1,160 +1,158 @@
-// THINGS TODO:
-// 1.0 Need to open and read data from file
-//  1.1: prompt user what file to open
-//  1.2: open that file with a filestream object
-//  1.3: create a new file with a '.huf. extenstion to write the compressed data
-//  1.4: get the glyphs and freq from the data and put it in an array
-// 2.0 writting to '.huf' file
-//  2.1: get lenght of sourcefilename
-//  2.2: write sourcefilename
-//  2.3: write number of entries
-//  2.4: write the huffman table (could be from an array)
-//  2.5: write the compressed data
-// 3.0 Huffman Table:
-//  3.1 write merge algortim
-//  3.2 write reheap algortim
-//  3.3 put each node in the array
-// 4.0:The compressed data:
-//  4.1 IDK how to write the compressed data
-
-
-
-
+#include <cmath>
+#include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 #include <ctime>
-#include<fstream>
 
-using namespace std;
+using std::cin;
+using std::cout;
+using std::endl;
+using std::hex;
+using std::ifstream;
+using std::ios;
+using std::ofstream;
+using std::pow;
+using std::setfill;
+using std::setw;
+using std::streamsize;
+using std::string;
+using std::swap;
+using std::uppercase;
+using std::setprecision;
+using std::fixed;
+// Functions taken from: https://stackoverflow.com/questions/25706991/appending-a-file-extension-in-a-c-progam
+bool EndsWith(string const &, string const);
+void AppendFileExtension(string & str, string const suffix);
+// Function taken from: https://stackoverflow.com/questions/6417817/easy-way-to-remove-extension-from-a-filename
+string RemoveFileExtension(const string& filename);
 
-const int MAXTEXT = 80;
-const int MAXCODE = 64;
-const int MAXGLYPH = 257;
-const int EOF_GLYPH = 256;
-
-struct HuffTable
-{
-    int glyph;
-    int frequency;
-    int leftP;
-    int rightP;
+struct HuffTableEntry {
+	int glyph;
+	int left;
+	int right;
+	int frequency;
 };
 
-struct HUFFMANINFO {
-
-};
-
-struct FAKESTRING {
-    char s{ MAXCODE };
-};
-
-typedef HUFFMANINFO HuffTable[2 + MAXGLYPH - 1];
-
-typedef char BITSTRING[MAXGLYPH + 1];
-
-HuffTable table;
-CODETABLE code;
-
-int glyphs;
-char sourcefile[80];
-char destfile[80];
-
-ifstream source;
-ofstream dest;
-
-struct FileInformation 
-{
-    string fileName;
-    int fileNameLength;
-    double fileStreamLength;
-    int glyphsInFile;
-};
-
-void CreateInitialTable() {
-
-    int i;
-    unsigned char buffer[MAXTEXT];
-
-    for (i = 0; i <= MAXGLYPH; i++) {
-        table[i].freq = 0;
-        table[i].glyph = 0;
-        table[i].left = 0;
-        table[i].right = 0;
-    }
-
-    while (!source.eof()) {
-        source.read((char*)buffer.MAXTEXT);
-        for (i = 0; i < source.gcount(); i++) {
-            table[buffer[i]].freq++
-        }
-        
-    }
-
-    table[EOF_GLYPH].freq = 1;
-
-    Compact();
-    SelectionSort();
-}
-
-void SelectionSort() {
-    HuffTable temp;
-    int i, j, small;
-
-    for (i = 0; i <= (glyphs - 2); i++) {
-        small = i;
-        for(j = i +1, j<=(glyphs - 1); j++)
-            if (table[j].freq < table[small].freq) {
-                small = j;
-            }
-        temp = table[i];
-        table[i] = small;
-        table[small] = temp;
-    }
-}
-
-
-void WriteTable() {
-    int tableSize = 2 * glyphs - 1;
-    dest.write((char*)&tablesize, sizeof(tableSize));
-
-    for (int i = 0; i < tableSize; i++) {
-        dest.write((char*)&table[i].glyph, sizeof(table[i].glyph));
-        dest.write((char*)&table[i].left, sizeof(table[i].left));
-        dest.write((char*)&table[i].right, sizeof(table[i].right));
-    }
-}
-
-
-void EncodeFile() {
-
-    unsigned char buffer[MAXTEST];
-    int i;
-
-    WriteTable();
-    c = 0;
-    p = 1;
-    source.clear();
-    source.seekg(0);
-    
-}
+void BubbleSort(HuffTableEntry[], int);
+void CreateHuffmanTable(HuffTableEntry[], int);
+void GetCodes(HuffTableEntry frequency_table[], HuffTableEntry node, string& code, string codes[]);
+int MarkM(HuffTableEntry[], const int, const int);
+void Reheap(HuffTableEntry[], int, int);
 
 int main() {
-    // get filename
-    FileInformation newFile;
-    cout << "Filename to compress: ";
-    cin >> newFile.fileName;
+	int length_of_file_name;
+	string input_file_name;
+	string output_file_name;
+    clock_t start, end;
+	cout << "Please enter a file name: ";
+	getline(cin, input_file_name);
+	output_file_name = input_file_name;
+	length_of_file_name = input_file_name.length();
+	ifstream fin(input_file_name, ios::in | ios::binary);
 
-    newFile.fileNameLength = sizeof(newFile.fileName);
-    cout << newFile.fileNameLength << endl;
-    
+	AppendFileExtension(output_file_name, ".huf");
+	ofstream out(output_file_name, ios::out | ios::binary  );
 
+    //Start timer
+    start = clock();
 
-    // Length of sourcefilename, sourcefilename, and then number of huffman entries
+	int glyph_frequency[257] = {0};
+	unsigned char input;
+	while (fin.read((char*)&input, 1)) {
+		glyph_frequency[input]++;
+	}
+	glyph_frequency[256] = 1; // End of file frequency.
 
-    // 1. get freq and gl 4. yphs from file
-    // 2. then sort array smallest to largest
-    // 3. mark 'H' and 'M'
-    // 4. follow instrucitons on canvas
-    // 5. create reheap function to go through all entries to make sure the lowest are in 1 and 2
-    // 6. crearte function to write each element in the array to the .huf file.
+	HuffTableEntry frequency_table[513];
+	int index = 0;
+	for (int i = 0; i < 257; i++) {
+		if (glyph_frequency[i] != 0) {
+			frequency_table[index].glyph = i;
+			frequency_table[index].frequency = glyph_frequency[i];
+			frequency_table[index].left = -1;
+			frequency_table[index].right = -1;
+			index++;
+		}
+	}
+	int length = index;
+	// Sort the frequency table.
+	BubbleSort(frequency_table, length);
+
+	CreateHuffmanTable(frequency_table, length);
+
+	//generate Huffman codes
+	string bitcodes[257] = { "" };
+	string code = "";
+	GetCodes(frequency_table, frequency_table[0], code, bitcodes);
+
+	//write the header data (length of filename, filename, #huffman entries, huffman table)
+	int numEntries = (length * 2) - 1;
+
+	out.write((char *) &length_of_file_name, sizeof(length_of_file_name));
+	out.write(input_file_name.c_str(), length_of_file_name);
+	out.write((char *) &numEntries, sizeof(numEntries));
+
+	for (int i = 0; i < numEntries; i++) {
+		out.write((char *) &frequency_table[i].glyph, sizeof(frequency_table[i].glyph));
+		out.write((char *) &frequency_table[i].left, sizeof(frequency_table[i].left));
+		out.write((char *) &frequency_table[i].right, sizeof(frequency_table[i].right));
+	}
+
+	fin.clear();
+	fin.seekg(0, fin.beg);
+
+	int bitstring_length;
+	int count = 0;
+	string bitstring;
+	unsigned char input_byte[1];
+	unsigned char output_byte = '\0';
+	while (fin.read((char *)&input_byte, sizeof(output_byte))) {
+	 bitstring = bitcodes[input_byte[0]];
+		//encode the byte, write it out one byte at a time
+		bitstring_length = bitstring.length();
+		for (int i = 0; i < bitstring_length; i++) {
+			if (bitstring[i] == '1') {
+				output_byte = output_byte | (int)pow(2.0, count);
+			}
+			count++;
+			if (count == 8) {
+				//write the byte out to file
+				out.write((char *)&output_byte, sizeof(output_byte));
+				//reset the byte
+				output_byte = '\0';
+				count = 0;
+			}
+		}
+	}
+	
+	bitstring = bitcodes[256];
+	bitstring_length = bitstring.length();
+	for (int i = 0; i < bitstring_length; i++) {
+		if (bitstring[i] == '1') {
+			output_byte = output_byte | (int)pow(2.0, count);
+		}
+		count++;
+		if (count == 8) {
+			//write the byte out to file
+			out.write((char *) &output_byte, sizeof(output_byte));
+			//reset the byte
+			output_byte = '\0';
+			count = 0;
+		}
+	}
+
+	if(count != 0){
+		//write out byte even if not full
+		out.write((char *)&output_byte, sizeof(output_byte));
+	}
+
+	//close the files
+	fin.close();
+	out.close();
+
+    end = clock();
+    cout << setprecision(5) << fixed;
+    cout << "The time was " << (double(end - start) / CLOCKS_PER_SEC) <<
+        " seconds." << endl;
 }
