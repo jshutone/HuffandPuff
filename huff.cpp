@@ -292,3 +292,21 @@ void Reheap(HuffTableEntry frequency_table[], int m, int h)
 		}
 	}
 }
+
+inline void GetCodes(HuffTableEntry frequency_table[], HuffTableEntry node, string& code, string bitcodes[]) {
+	if (node.glyph != -1) {
+		bitcodes[node.glyph] = code;
+	}
+	else {
+		if (node.left != -1) {
+			code.append("0");
+			GetCodes(frequency_table, frequency_table[node.left], code, bitcodes);
+			code.erase(code.size() - 1, 1);
+		}
+		if (node.right != -1) {
+			code.append("1");
+			GetCodes(frequency_table, frequency_table[node.right], code, bitcodes);
+			code.erase(code.size() - 1, 1);
+		}
+	}
+}
